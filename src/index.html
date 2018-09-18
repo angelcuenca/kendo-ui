@@ -1,17 +1,17 @@
+
 <!DOCTYPE html>
 <html>
 <head>
     <base href="https://demos.telerik.com/kendo-ui/templates/index">
     <style>html { font-size: 14px; font-family: Arial, Helvetica, sans-serif; }</style>
-    <title></title>
+    <title>Softek Exercise</title>
     <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.3.911/styles/kendo.common-material.min.css" />
     <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.3.911/styles/kendo.material.min.css" />
     <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.3.911/styles/kendo.material.mobile.min.css" />
 
-    <script src="https://kendo.cdn.telerik.com/2018.3.911/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
     <script src="https://kendo.cdn.telerik.com/2018.3.911/js/kendo.all.min.js"></script>
     
-
 </head>
 <body>
 <div class="header">
@@ -22,7 +22,12 @@
      <div id="splitter">
        <div id="left">
          <div class="inner">
-           <h3>Create</h3>
+           <div class="demo-section k-content wide">
+                <div>
+                    <h4>Select product name</h4>
+                    <input id="productName" name="productName" />
+                </div>                
+            </div>
          </div>
        </div>
      </div>
@@ -37,122 +42,49 @@
     </div>
     <div id="right">
        <div class="right">
-         <h3>Edit</h3>
+         <h3>Selected</h3>
+         <form id="gridEditor">
+            <label>Id <input type="text" name="Id" data-bind="value: Id" class="k-textbox" /></label>
+           <label>Name <input type="text" name="Name" data-bind="value: Name" class="k-textbox" /></label>
+           <label>Category <input type="text" name="Category" data-bind="value: Category" class="k-textbox" /></label>
+           <label>Stock <input type="text" name="Stock" data-bind="value: Stock" class="k-textbox" /></label>
+           <label>Price <input type="text" name="Price" data-bind="value: Price" class="k-textbox" /></label>
+          </form>
        </div>
      </div>
   </div>
 </div>
 
 <script>
-
-$(function(){
-  
-  var jsonData = [ 
-    { 
-      "Id":"878637-010",
-      "Name":"ZOOM KD 9 ELITE HYPER ORANGE",
-      "Category": "Basketball",
-      "Stock":15,
-      "Price":2899.00
-    },
-    { 
-      "Id":"852405-004",
-      "Name":"LEBRON XIV",
-      "Category": "Basketball",
-      "Stock":1,
-      "Price":3699.00
-    },
-    { 
-      "Id":"881465-120",
-      "Name":"JORDAN FORMULA 23",
-      "Category": "Basketball",
-      "Stock":5,
-      "Price":2399.00
-    },
-    { 
-      "Id":"852422-601",
-      "Name":"ZOOM REV 2017",
-      "Category": "Basketball",
-      "Stock":0,
-      "Price":1999.00
-    },
-    { 
-      "Id":"852473-600",
-      "Name":"MAMBA INSTINCT",
-      "Category": "Basketball",
-      "Stock":0,
-      "Price":1799.00
-    },
-    { 
-      "Id":"917391-010",
-      "Name":"PLAYERA DRY KD",
-      "Category": "Shirts",
-      "Stock":20,
-      "Price":549
-    },
-    { 
-      "Id":"843130-477",
-      "Name":"PLAYERA AIR JORDAN 23",
-      "Category": "Shirts",
-      "Stock":40,
-      "Price":549.00
-    },
-    { 
-      "Id":"831348-100",
-      "Name":"SHORT ULTIMATE FLIGHT",
-      "Category": "Shorts",
-      "Stock":10,
-      "Price":899.00
-    },
-    { 
-      "Id":"836277-457",
-      "Name":"SHORT FT GX FRANCHISE",
-      "Category": "Shorts",
-      "Stock":10,
-      "Price":849
-    },
-    { 
-      "Id":"1281295-002",
-      "Name":"SHORT SC30 TOP GUN",
-      "Category": "Shorts",
-      "Stock":5,
-      "Price":799
-    }
-   ];
-    
-  /*var sourceData = new kendo.data.DataSource({
-  	pageSize: 10,
-    transport: {
-      read: jsonData
-    },
-  });
-  
-    
-  $('#dataGrid').kendoGrid({
-    dataSource: sourceData,
-    selectable: true,
-    columns: [
-      { field: "id", title: "Id"},
-      { field: "Name", title: "Name" },
-      { field: "Category", title:"Category", width: "100px" },
-      { field: "Stock", title:"Stock", width: "100px" },
-      { field: "Price", title: "Price", width: "100px" }
-    ]
-  });*/
-  
-    var productsDataSource = new kendo.data.DataSource({
+$(function(){    
+   // define datasource
+   // I stored the json provided in a hosting server
+   var productsDataSource = new kendo.data.DataSource({
       //type: "odata",
-      serverFiltering: true,
+      serverFiltering: false,
       serverPaging: true,
       serverSorting: true,
       pageSize: 10,
       transport: {
-        read: jsonData
+        read: "https://api.myjson.com/bins/rmb5w"
       },
     });   
 
     productsDataSource.read();
-                    
+  
+    // search field
+    $("#productName").kendoAutoComplete({
+       autoBind: false,
+       dataSource: productsDataSource,
+       dataTextField: "Name",
+       filter: "contains",
+       minLength: 1                                                       
+    });
+  	
+  	// Display Items selected
+  	$("#gridEditor").kendoValidator();
+  	
+  	// Build grid
     $("#dataGrid").kendoGrid({
       dataSource: productsDataSource,
       autoBind: false,
@@ -160,14 +92,24 @@ $(function(){
       height: 300,
       selectable: true,
       columns: [
-        {field: "Id", title: "ProductName"},
-        { field: "Name", title: "Unit Price" },
-        { field: "Category", title:"Units In Stock"},
-        { field: "Stock", width: "100px" },
-        { field: "Price", width: "100px" }
-      ]
+        {field: "Id", title: "Id"},
+        { field: "Name", title: "Name" },
+        { field: "Category", title:"Category"},
+        { field: "Stock", title:"Stock", width: "100px" },
+        { field: "Price",title:"Price", width: "100px", format: "{0:c}"}
+      ],
+      change: function(e) {        
+        var selectedRows = this.select();
+        var selectedDataItems = [];
+        for (var i = 0; i < selectedRows.length; i++) {
+          var dataItem = this.dataItem(selectedRows[i]);
+          selectedDataItems.push(dataItem); console.log("item selected "+dataItem.Name);
+          // push element to selected form
+          kendo.bind($("#gridEditor"), dataItem);
+        }
+        // selectedDataItems contains all selected data items
+      }
     }); 
-  
 });
 </script>
 </body>
