@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base href="https://demos.telerik.com/kendo-ui/templates/index">
+    <style>html { font-size: 14px; font-family: Arial, Helvetica, sans-serif; }</style>
+    <title></title>
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.3.911/styles/kendo.common-material.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.3.911/styles/kendo.material.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.3.911/styles/kendo.material.mobile.min.css" />
+
+    <script src="https://kendo.cdn.telerik.com/2018.3.911/js/jquery.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2018.3.911/js/kendo.all.min.js"></script>
+    
+
+</head>
+<body>
+<div class="header">
+  <h1> Kendo UI DataSource</h1>
+</div>
+<div>
+  <div id="wrapper">
+     <div id="splitter">
+       <div id="left">
+         <div class="inner">
+           <h3>Create</h3>
+         </div>
+       </div>
+     </div>
+     <div id="middle">
+       <div id="right-top">
+         <div class="inner">
+           <h3>Data</h3>
+           <div id="dataGrid"> 
+           </div>           
+         </div>
+       </div>
+    </div>
+    <div id="right">
+       <div class="right">
+         <h3>Edit</h3>
+       </div>
+     </div>
+  </div>
+</div>
+
+<script>
+
+$(function(){
+  
+  var jsonData = [ 
+    { 
+      "Id":"878637-010",
+      "Name":"ZOOM KD 9 ELITE HYPER ORANGE",
+      "Category": "Basketball",
+      "Stock":15,
+      "Price":2899.00
+    },
+    { 
+      "Id":"852405-004",
+      "Name":"LEBRON XIV",
+      "Category": "Basketball",
+      "Stock":1,
+      "Price":3699.00
+    },
+    { 
+      "Id":"881465-120",
+      "Name":"JORDAN FORMULA 23",
+      "Category": "Basketball",
+      "Stock":5,
+      "Price":2399.00
+    },
+    { 
+      "Id":"852422-601",
+      "Name":"ZOOM REV 2017",
+      "Category": "Basketball",
+      "Stock":0,
+      "Price":1999.00
+    },
+    { 
+      "Id":"852473-600",
+      "Name":"MAMBA INSTINCT",
+      "Category": "Basketball",
+      "Stock":0,
+      "Price":1799.00
+    },
+    { 
+      "Id":"917391-010",
+      "Name":"PLAYERA DRY KD",
+      "Category": "Shirts",
+      "Stock":20,
+      "Price":549
+    },
+    { 
+      "Id":"843130-477",
+      "Name":"PLAYERA AIR JORDAN 23",
+      "Category": "Shirts",
+      "Stock":40,
+      "Price":549.00
+    },
+    { 
+      "Id":"831348-100",
+      "Name":"SHORT ULTIMATE FLIGHT",
+      "Category": "Shorts",
+      "Stock":10,
+      "Price":899.00
+    },
+    { 
+      "Id":"836277-457",
+      "Name":"SHORT FT GX FRANCHISE",
+      "Category": "Shorts",
+      "Stock":10,
+      "Price":849
+    },
+    { 
+      "Id":"1281295-002",
+      "Name":"SHORT SC30 TOP GUN",
+      "Category": "Shorts",
+      "Stock":5,
+      "Price":799
+    }
+   ];
+    
+  /*var sourceData = new kendo.data.DataSource({
+  	pageSize: 10,
+    transport: {
+      read: jsonData
+    },
+  });
+  
+    
+  $('#dataGrid').kendoGrid({
+    dataSource: sourceData,
+    selectable: true,
+    columns: [
+      { field: "id", title: "Id"},
+      { field: "Name", title: "Name" },
+      { field: "Category", title:"Category", width: "100px" },
+      { field: "Stock", title:"Stock", width: "100px" },
+      { field: "Price", title: "Price", width: "100px" }
+    ]
+  });*/
+  
+    var productsDataSource = new kendo.data.DataSource({
+      //type: "odata",
+      serverFiltering: true,
+      serverPaging: true,
+      serverSorting: true,
+      pageSize: 10,
+      transport: {
+        read: jsonData
+      },
+    });   
+
+    productsDataSource.read();
+                    
+    $("#dataGrid").kendoGrid({
+      dataSource: productsDataSource,
+      autoBind: false,
+      pageable: true,
+      height: 300,
+      selectable: true,
+      columns: [
+        {field: "Id", title: "ProductName"},
+        { field: "Name", title: "Unit Price" },
+        { field: "Category", title:"Units In Stock"},
+        { field: "Stock", width: "100px" },
+        { field: "Price", width: "100px" }
+      ]
+    }); 
+  
+});
+</script>
+</body>
+</html>
