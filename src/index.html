@@ -11,6 +11,13 @@
 
     <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
     <script src="https://kendo.cdn.telerik.com/2018.3.911/js/kendo.all.min.js"></script>
+  
+<style>
+    /* Clear button */
+    #clear {
+      margin-bottom: 10px;
+    }
+</style>
     
 </head>
 <body>
@@ -42,37 +49,35 @@
     </div>
     <div id="right">
        <div class="right">
-         <h3>Selected</h3>
-         <form id="gridEditor">
-            <label>Id <input type="text" name="Id" data-bind="value: Id" class="k-textbox" /></label>
-           <label>Name <input type="text" name="Name" data-bind="value: Name" class="k-textbox" /></label>
-           <label>Category <input type="text" name="Category" data-bind="value: Category" class="k-textbox" /></label>
-           <label>Stock <input type="text" name="Stock" data-bind="value: Stock" class="k-textbox" /></label>
-           <label>Price <input type="text" name="Price" data-bind="value: Price" class="k-textbox" /></label>
-          </form>
+         <div>
+           <h3>Cart</h3>
+           <h5>Total of items:</h5><span data-bind="html: totalItems"></span>                <button id="clear">Clear</button>
+         </div>
+         <div id="selectedGrid">
        </div>
      </div>
   </div>
 </div>
 
 <script>
-$(function(){    
-   // define datasource
-   // I stored the json provided in a hosting server
-   var productsDataSource = new kendo.data.DataSource({
-      //type: "odata",
+$(function(){  
+  var selectedDataItems = [];
+  var productsDataSource = [];
+  
+  // Define datasource
+  // I stored the json provided in a hosting server
+   productsDataSource = new kendo.data.DataSource({
       serverFiltering: false,
       serverPaging: true,
       serverSorting: true,
       pageSize: 10,
       transport: {
         read: "https://api.myjson.com/bins/rmb5w"
-      },
+      }
     });   
-
     productsDataSource.read();
   
-    // search field
+    // Search field
     $("#productName").kendoAutoComplete({
        autoBind: false,
        dataSource: productsDataSource,
@@ -84,7 +89,7 @@ $(function(){
   	// Display Items selected
   	$("#gridEditor").kendoValidator();
   	
-  	// Build grid
+  	// Build data grid
     $("#dataGrid").kendoGrid({
       dataSource: productsDataSource,
       autoBind: false,
@@ -100,16 +105,57 @@ $(function(){
       ],
       change: function(e) {        
         var selectedRows = this.select();
-        var selectedDataItems = [];
         for (var i = 0; i < selectedRows.length; i++) {
           var dataItem = this.dataItem(selectedRows[i]);
-          selectedDataItems.push(dataItem); console.log("item selected "+dataItem.Name);
-          // push element to selected form
-          kendo.bind($("#gridEditor"), dataItem);
+          // adding one product
+          dataItem.Stock = 1;
+          
+          // validate if product is already selected (if needed adding one more)
+          var alreadyAdded = false;
+          for (var i = 0; i < selectedDataItems.length; i++) {
+          	if( selectedDataItems[i].Name == dataItem.Name ){           	
+          		selectedDataItems[i].Stock += 1; 
+              alreadyAdded = true;
+            }
+          }
+          
+          if( !alreadyAdded ){  console.log("nuevo");
+          	selectedDataItems.push(dataItem);       
+          }
+          
+          // call function to render the selected rows
+          showSelectedRows(selectedDataItems);
         }
-        // selectedDataItems contains all selected data items
       }
     }); 
+  	
+  	// Render data selected
+    function showSelectedRows(selectedDataItems){ 
+            
+      $("#selectedGrid").kendoGrid({
+        dataSource: selectedDataItems,
+        autoBind: true,
+        height: 300,
+        selectable: true,
+        columns: [
+          {field: "Id", title: "Id"},
+          { field: "Name", title: "Name" },
+          { field: "Category", title:"Category"},
+          { field: "Stock", title:"Stock", width: "100px" },
+          { field: "Price",title:"Price", width: "100px", format: "{0:c}"}
+        ]
+      }); 
+    }  	
+  
+  	// Clear cart data
+    $("#clear").kendoButton({
+      click: function(e) { 
+        selectedDataItems = [];                 
+        showSelectedRows(selectedDataItems);
+      }
+    })
+  
+  
 });
 </script>
 </body>
